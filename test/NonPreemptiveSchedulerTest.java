@@ -1,26 +1,54 @@
-package schedulers;
+package test;
 
+import algorithms.NonPreemptiveScheduler;
+import algorithms.Process;
 import java.util.LinkedList;
 
 public class NonPreemptiveSchedulerTest {
     public static void main(String[] args) {
-        // Creating a list of incoming processes
-        LinkedList<Process> listOfIncomingProcesses = new LinkedList<>();
-        listOfIncomingProcesses.add(new Process(1, 10, 0, 2)); // Process ID, Arrival Time, CPU Burst Time, Priority
-        listOfIncomingProcesses.add(new Process(2, 5, 0, 1));
-        listOfIncomingProcesses.add(new Process(3, 2, 0, 3));
-
-        // Creating and testing the NonPreemptiveScheduler with different algorithms
-        // testScheduler(listOfIncomingProcesses, "FCFS");
-        // testScheduler(listOfIncomingProcesses, "SJF");
-        testScheduler(listOfIncomingProcesses, "Prio");
+        testFCFS();
+        testSJF();
+        testRoundRobin();
     }
 
-    private static void testScheduler(LinkedList<Process> processes, String algo) {
-        System.out.println("Testing NonPreemptiveScheduler with algorithm: " + algo);
-        LinkedList<Process> processesCopy = new LinkedList<>(processes); // Making a copy to avoid modifying the original list
-        NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processesCopy, algo);
+    private static void testFCFS() {
+        System.out.println("Testing NonPreemptiveScheduler with algorithm: FCFS");
+        LinkedList<Process> processes = createTestProcesses();
+        NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processes, "FCFS");
         LinkedList<Process> completedProcesses = scheduler.simulate();
-        System.out.println("--------------------------------------------------");
+        printProcessCompletionOrder(completedProcesses);
+    }
+
+    private static void testSJF() {
+        System.out.println("Testing NonPreemptiveScheduler with algorithm: SJF");
+        LinkedList<Process> processes = createTestProcesses();
+        NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processes, "SJF");
+        LinkedList<Process> completedProcesses = scheduler.simulate();
+        printProcessCompletionOrder(completedProcesses);
+    }
+
+    private static void testRoundRobin() {
+        System.out.println("Testing NonPreemptiveScheduler with algorithm: RoundRobin");
+        LinkedList<Process> processes = createTestProcesses();
+        int timeQuantum = 2;
+        NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processes, "RoundRobin", timeQuantum);
+        LinkedList<Process> completedProcesses = scheduler.simulate();
+        printProcessCompletionOrder(completedProcesses);
+    }
+
+    private static LinkedList<Process> createTestProcesses() {
+        LinkedList<Process> processes = new LinkedList<>();
+        processes.add(new Process(1, 3, 5, 1)); // Process ID, Arrival Time, Burst Time, Priority
+        processes.add(new Process(2, 5, 3, 3));
+        processes.add(new Process(3, 7, 8, 2));
+        processes.add(new Process(4, 9, 6, 4));
+        return processes;
+    }
+
+    private static void printProcessCompletionOrder(LinkedList<Process> completedProcesses) {
+        for (Process process : completedProcesses) {
+            System.out.println("Process ID: " + process.getProcessId() + ", Completion Time: " + process.getCompletionTime());
+        }
+        System.out.println();
     }
 }

@@ -1,4 +1,5 @@
-package schedulers;
+package algorithms;
+
 public class Process {
     private int burstTime;
     private int arrivalTime;

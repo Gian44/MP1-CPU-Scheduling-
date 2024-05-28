@@ -1,5 +1,7 @@
-package schedulers;
+package test;
 
+import algorithms.PremptiveScheduler;
+import algorithms.Process;
 import java.util.LinkedList;
 
 public class PremptiveSchedulerTest {
