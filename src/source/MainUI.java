@@ -817,6 +817,24 @@ public class MainUI extends javax.swing.JFrame {
     public int getNumOfQueues(){
         return numberOfQueues;
     }
+    public String getQueue1Algo(){
+        return Queue1Algo;
+    }
+    public int getQueue1Quantum(){
+        return Queue1Quantum;
+    }
+    public String getQueue2Algo(){
+        return Queue1Algo;
+    }
+    public int getQueue2Quantum(){
+        return Queue2Quantum;
+    }
+    public String getQueue3Algo(){
+        return Queue1Algo;
+    }
+    public int getQueue3Quantum(){
+        return Queue3Quantum;
+    }
 
 }
 
