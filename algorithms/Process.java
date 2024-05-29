@@ -7,6 +7,7 @@ public class Process {
     private int firstExecutionTime = -1;
     private int completionTime;
     private int remainingTime;
+    private int allocatedTime = 0; // Prevents from being overwritten again
     private String processId;
 
     public Process(Object processId, int burstTime, int arrivalTime, int priority) {
@@ -39,6 +40,10 @@ public class Process {
 
     public int getPriority() {
         return this.priority;
+    }
+
+    public void setPriority (int priority) {
+        this.priority = priority;
     }
 
     public int getCompletionTime() {
@@ -77,5 +82,23 @@ public class Process {
 
     public void resetRemainingTime() {
         this.remainingTime = this.burstTime;
+    }
+
+    public void setAllocatedTime(int allocatedTime) {
+        if (this.allocatedTime == 0) {
+            this.allocatedTime = allocatedTime;
+        }
+    }
+
+    public int getAllocatedTime() {
+        return allocatedTime;
+    }
+
+    public void decrementAllocatedTime(){
+        this.allocatedTime--;
+    }
+
+    public boolean noMoreAllocatedTime() {
+        return allocatedTime == 0;
     }
 }
