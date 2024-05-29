@@ -57,6 +57,12 @@ public class MainUI extends javax.swing.JFrame {
     private int numberOfProcess;
     private String selectedPrioOrder;
     private int numberOfQueues;
+    private String Queue1Algo;
+    private int Queue1Quantum;
+    private String Queue2Algo;
+    private int Queue2Quantum;
+    private String Queue3Algo;
+    private int Queue3Quantum;
     
     // End of variables declaration  
 
@@ -335,7 +341,7 @@ public class MainUI extends javax.swing.JFrame {
         Queue1QuantumLbl.setText("Quantum: ");
         
         Queue1QuantumLbl.setBounds(70, 110, 60, 14); 
-        Queue1QuantumInput.setText("0");
+        Queue1QuantumInput.setText("1");
         Queue1QuantumInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Queue1QuantumInputActionPerformed(evt);
@@ -368,7 +374,7 @@ public class MainUI extends javax.swing.JFrame {
         Queue2QuantumLbl.setText("Quantum: ");
         Queue2QuantumLbl.setBounds(70, 180, 60, 14);
 
-        Queue2QuantumInput.setText("0");
+        Queue2QuantumInput.setText("1");
         Queue2QuantumInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Queue2QuantumInputActionPerformed(evt);
@@ -400,7 +406,7 @@ public class MainUI extends javax.swing.JFrame {
         Queue3QuantumLbl.setText("Quantum: ");
         Queue3QuantumLbl.setBounds(70, 250, 60, 14);
 
-        Queue3QuantumInput.setText("0");
+        Queue3QuantumInput.setText("1");
         Queue3QuantumInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Queue3QuantumInputActionPerformed(evt);
@@ -536,6 +542,7 @@ public class MainUI extends javax.swing.JFrame {
                         evt.consume();
                     } else {
                         numOfProcessTxtField.setText(newText);
+                        numberOfProcess = value;
                     }
                 } catch (NumberFormatException e) {
                     evt.consume(); // Consume input if the entered value is not a valid number
@@ -606,6 +613,7 @@ public class MainUI extends javax.swing.JFrame {
                                                    
     private void Queue1AlgoOptionsActionPerformed(ActionEvent evt) {
 		String choseNalgo = (String) Queue1AlgoOptions.getSelectedItem();
+        Queue1Algo = choseNalgo;
 		if(choseNalgo.equals("Round Robin")) {
 			MultilevelQueuePanel.add(Queue1QuantumLbl);
 			MultilevelQueuePanel.add(Queue1QuantumInput);
@@ -617,27 +625,46 @@ public class MainUI extends javax.swing.JFrame {
 		repaint();
 	}
     private void Queue1QuantumInputActionPerformed(java.awt.event.ActionEvent evt) {                                                   
-        // TODO add your handling code here:
+        
     } 
     private void Queue1QuantumInputKeyTyped(KeyEvent evt) {
-    	char c = evt.getKeyChar();
-		if (!Character.isDigit(c) || Queue1QuantumInput.getText().length() >= 2) {
-	        evt.consume();
-	    } else {
-	    	 if (Queue1QuantumInput.getText().equals("0")) {
-	    		 Queue1QuantumInput.setText("");
-	         }
-	        String currentText = Queue1QuantumInput.getText();
-	        String newText = currentText + c;
-	        int value = Integer.parseInt(newText);
-	        if (value < 1 || value > 30) {
-	            evt.consume();
-	        }
-	    }
-	}
+        char c = evt.getKeyChar();
+        String currentText = Queue1QuantumInput.getText();
+    
+        if (c == KeyEvent.VK_BACK_SPACE) {
+            if (!currentText.isEmpty()) {
+                // Allow backspace if the text field is not empty
+                Queue1QuantumInput.setText(currentText.substring(0, currentText.length() - 1));
+                evt.consume();
+            }
+        } else if (!Character.isDigit(c) || currentText.length() >= 2) {
+            evt.consume(); // Consume invalid input
+        } else {
+            if (currentText.equals("0")) {
+                // If the current text is "0", replace it with the typed digit
+                currentText = "";
+            }
+    
+            String newText = currentText + c;
+            try {
+                int value = Integer.parseInt(newText);
+                if (value < 1 || value > 15) {
+                    evt.consume(); // Consume input if the entered number is out of range
+                } else {
+                    Queue1QuantumInput.setText(newText);
+                    Queue1Quantum = value;
+                    evt.consume(); // Consume the event to prevent default behavior
+                }
+            } catch (NumberFormatException e) {
+                evt.consume(); // Consume input if the entered value is not a valid number
+            }
+        }
+    }
+    
     
     private void Queue2AlgoOptionsActionPerformed(ActionEvent evt) {
 		String choseNalgo = (String) Queue2AlgoOptions.getSelectedItem();
+        Queue2Algo = choseNalgo;
 		if(choseNalgo.equals("Round Robin")) {
 			MultilevelQueuePanel.add(Queue2QuantumLbl);
 			MultilevelQueuePanel.add(Queue2QuantumInput);
@@ -654,24 +681,42 @@ public class MainUI extends javax.swing.JFrame {
     } 
     private void Queue2QuantumInputKeyTyped(KeyEvent evt) {
     	char c = evt.getKeyChar();
-		if (!Character.isDigit(c) || Queue2QuantumInput.getText().length() >= 2) {
-	        evt.consume();
-	    } else {
-	    	 if (Queue2QuantumInput.getText().equals("0")) {
-	    		 Queue2QuantumInput.setText("");
-	         }
-	        String currentText = Queue2QuantumInput.getText();
-	        String newText = currentText + c;
-	        int value = Integer.parseInt(newText);
-	        if (value < 1 || value > 30) {
-	            evt.consume();
-	        }
-	    }
+        String currentText = Queue2QuantumInput.getText();
+    
+        if (c == KeyEvent.VK_BACK_SPACE) {
+            if (!currentText.isEmpty()) {
+                // Allow backspace if the text field is not empty
+                Queue2QuantumInput.setText(currentText.substring(0, currentText.length() - 1));
+                evt.consume();
+            }
+        } else if (!Character.isDigit(c) || currentText.length() >= 2) {
+            evt.consume(); // Consume invalid input
+        } else {
+            if (currentText.equals("0")) {
+                // If the current text is "0", replace it with the typed digit
+                currentText = "";
+            }
+    
+            String newText = currentText + c;
+            try {
+                int value = Integer.parseInt(newText);
+                if (value < 1 || value > 15) {
+                    evt.consume(); // Consume input if the entered number is out of range
+                } else {
+                    Queue2QuantumInput.setText(newText);
+                    Queue2Quantum = value;
+                    evt.consume(); // Consume the event to prevent default behavior
+                }
+            } catch (NumberFormatException e) {
+                evt.consume(); // Consume input if the entered value is not a valid number
+            }
+        }
 		
 	} 
     
     private void Queue3AlgoOptionsActionPerformed(ActionEvent evt) {
 		String choseNalgo = (String) Queue3AlgoOptions.getSelectedItem();
+        Queue3Algo = choseNalgo;
 		if(choseNalgo.equals("Round Robin")) {
 			MultilevelQueuePanel.add(Queue3QuantumLbl);
 			MultilevelQueuePanel.add(Queue3QuantumInput);
@@ -687,19 +732,36 @@ public class MainUI extends javax.swing.JFrame {
     } 
     private void Queue3QuantumInputKeyTyped(KeyEvent evt) {
     	char c = evt.getKeyChar();
-		if (!Character.isDigit(c) || Queue3QuantumInput.getText().length() >= 2) {
-	        evt.consume();
-	    } else {
-	    	 if (Queue3QuantumInput.getText().equals("0")) {
-	    		 Queue3QuantumInput.setText("");
-	         }
-	        String currentText = Queue3QuantumInput.getText();
-	        String newText = currentText + c;
-	        int value = Integer.parseInt(newText);
-	        if (value < 1 || value > 30) {
-	            evt.consume();
-	        }
-	    }
+        String currentText = Queue3QuantumInput.getText();
+    
+        if (c == KeyEvent.VK_BACK_SPACE) {
+            if (!currentText.isEmpty()) {
+                // Allow backspace if the text field is not empty
+                Queue3QuantumInput.setText(currentText.substring(0, currentText.length() - 1));
+                evt.consume();
+            }
+        } else if (!Character.isDigit(c) || currentText.length() >= 2) {
+            evt.consume(); // Consume invalid input
+        } else {
+            if (currentText.equals("0")) {
+                // If the current text is "0", replace it with the typed digit
+                currentText = "";
+            }
+    
+            String newText = currentText + c;
+            try {
+                int value = Integer.parseInt(newText);
+                if (value < 1 || value > 15) {
+                    evt.consume(); // Consume input if the entered number is out of range
+                } else {
+                    Queue3QuantumInput.setText(newText);
+                    Queue3Quantum = value;
+                    evt.consume(); // Consume the event to prevent default behavior
+                }
+            } catch (NumberFormatException e) {
+                evt.consume(); // Consume input if the entered value is not a valid number
+            }
+        }
 	}
     
     private void AverageRTActionPerformed(java.awt.event.ActionEvent evt) {                                          
