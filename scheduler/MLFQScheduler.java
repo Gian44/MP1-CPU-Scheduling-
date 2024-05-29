@@ -36,11 +36,13 @@ public class MLFQScheduler {
                 remainingCPUTime = queueInfos.get(i).getTimeSlot();
                 while (remainingCPUTime > 0) {
                     addProcessToQueue(0);
+                    boolean higherProcessArrived = false;
                     if (!currentQueueIsEmpty(i)) {
                         if (algorithms.get(i).equalsIgnoreCase("FCFS") ||
-                        algorithms.get(i).equalsIgnoreCase("SJF")) {
-                            addProcessToQueue(0);
-                            if (algorithms.get(i).equalsIgnoreCase("SJF")) {
+                        algorithms.get(i).equalsIgnoreCase("SJF") ||
+                        algorithms.get(i).equalsIgnoreCase("SRTF")) {
+                            if (algorithms.get(i).equalsIgnoreCase("SJF") ||
+                            algorithms.get(i).equalsIgnoreCase("SRTF")) {
                                 sortProcessQueueByRemainingTIme(queues.get(i));
                             }
                             Process currentProcess = getCurrentProcess(i);
@@ -48,6 +50,14 @@ public class MLFQScheduler {
                             runTime = Math.min(runTime, currentProcess.getAllocatedTime());
                             
                             while (runTime > 0) {
+                                addProcessToQueue(0);
+                                if (algorithms.get(i).equalsIgnoreCase("SRTF")) {
+                                    sortProcessQueueByRemainingTIme(queues.get(0));
+                                    if (higherProcessArrived(currentProcess)) {
+                                        higherProcessArrived = true;
+                                        break;
+                                    }   
+                                }
                                 currentProcess.decrementRemainingBurstTime();
                                 currentProcess.decrementAllocatedTime();
                                 System.out.println("Time: " + time + " - Running Process: " + currentProcess.getProcessId() + " at Queue " + (i + 1));
@@ -56,26 +66,27 @@ public class MLFQScheduler {
                                 runTime--;
                             }
 
-                            // Demotion
-                            if (currentProcess.noMoreAllocatedTime() 
+                            if (currentProcess.hasFinishedExecution()) { // Completion
+                                computeTimeStatistics(currentProcess);
+                                listOfCompletedProcesses.add(currentProcess);
+                            }
+                            else if (currentProcess.noMoreAllocatedTime() 
                             && i + 1 < numberOfQueues 
-                            && !currentProcess.hasFinishedExecution()) {
+                            && !currentProcess.hasFinishedExecution()) { // Demotion
                                 currentProcess.setPriority(currentProcess.getPriority() - 1);
                                 currentProcess.setAllocatedTime(queueInfos.get(i + 1).getTimeQuantum());
                                 queues.get(i + 1).add(currentProcess);
                             }
-                            else {
-                                // Completed Execution
-                                if (currentProcess.hasFinishedExecution()) {
-                                    computeTimeStatistics(currentProcess);
-
-                                }
-                                else { // Retention
-                                    queues.get(i).add(currentProcess);
-                                    listOfCompletedProcesses.add(currentProcess);
-                                }       
+                            else if ((remainingCPUTime == 0 || higherProcessArrived) 
+                            && i - 1 >= 0 
+                            && !currentProcess.hasFinishedExecution()) { // Promotion
+                                currentProcess.setPriority(currentProcess.getPriority() + 1);
+                                currentProcess.setAllocatedTime(queueInfos.get(i - 1).getTimeQuantum());
+                                queues.get(i - 1).add(currentProcess);
+                            } 
+                            else { // Retention
+                                queues.get(i).add(currentProcess);
                             }
-                            // TODO: Implement promotion
                         }
                     }
                     else {
@@ -87,6 +98,13 @@ public class MLFQScheduler {
         }
     }
 
+    private boolean higherProcessArrived(Process process) {
+        if (queues.get(0).peek() == null) {
+            return false;
+        }
+        return queues.get(0).peek().getRemainingTime() < process.getRemainingTime();
+    }
+
     private Process getCurrentProcess(int i) {
         Process currentProcess = queues.get(i).poll();
         currentProcess.setFirstExecutionTime(time);
@@ -96,8 +114,8 @@ public class MLFQScheduler {
 
     public static void main(String[] args) {
         ArrayList<String> algorithms = new ArrayList<>();
-        algorithms.add("FCFS");
         algorithms.add("SJF");
+        algorithms.add("SRTF");
         algorithms.add("FCFS");
         MLFQScheduler test = new MLFQScheduler(createTestProcesses(), algorithms, 3);
         test.simulate();
