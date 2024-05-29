@@ -8,6 +8,7 @@ public class NonPreemptiveSchedulerTest {
     public static void main(String[] args) {
         testFCFS();
         testSJF();
+        testPrio();
         testRoundRobin();
     }
 
@@ -32,6 +33,14 @@ public class NonPreemptiveSchedulerTest {
         LinkedList<Process> processes = createTestProcesses();
         int timeQuantum = 2;
         NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processes, "RoundRobin", timeQuantum);
+        LinkedList<Process> completedProcesses = scheduler.simulate();
+        printProcessCompletionOrder(completedProcesses);
+    }
+
+    private static void testPrio() {
+        System.out.println("Testing NonPreemptiveScheduler with algorithm: Prio");
+        LinkedList<Process> processes = createTestProcesses();
+        NonPreemptiveScheduler scheduler = new NonPreemptiveScheduler(processes, "Prio");
         LinkedList<Process> completedProcesses = scheduler.simulate();
         printProcessCompletionOrder(completedProcesses);
     }

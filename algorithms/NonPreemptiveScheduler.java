@@ -12,7 +12,7 @@ public class NonPreemptiveScheduler {
     private PriorityQueue<Process> processesQueue;
     private LinkedList<Process> roundRobinQueue;
     private String algoToDo;
-    private int timeQuantum = 1;
+    private int timeQuantum = 0;
 
     public NonPreemptiveScheduler(LinkedList<Process> listOfIncomingProcesses, String algoToDo) {
         this.listOfIncomingProcesses = listOfIncomingProcesses;
@@ -34,7 +34,7 @@ public class NonPreemptiveScheduler {
             processesQueue = new PriorityQueue<>(Comparator.comparingInt(Process::getBurstTime));
         } else if (algoToDo.equalsIgnoreCase("RoundRobin")) {
             roundRobinQueue = new LinkedList<>();
-        } else {
+        } else if (algoToDo.equalsIgnoreCase("Prio")) {
             processesQueue = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
         }
     }
