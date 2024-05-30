@@ -136,7 +136,7 @@ public class MLFQScheduler {
 
     public static void main(String[] args) {
         ArrayList<String> algorithms = new ArrayList<>();
-        algorithms.add("FCFS");
+        algorithms.add("Robin");
         MLFQScheduler test = new MLFQScheduler(createTestProcesses(), algorithms, 1);
         for (String algorithm : algorithms) {
             if (algorithm.equalsIgnoreCase("Robin")) {
