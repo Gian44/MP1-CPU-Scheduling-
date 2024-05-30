@@ -1,8 +1,11 @@
 package source;
 
 
+import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 import java.util.Random;
 
 import javax.swing.*;
@@ -63,6 +66,9 @@ public class MainUI extends javax.swing.JFrame {
     private int Queue2Quantum;
     private String Queue3Algo;
     private int Queue3Quantum;
+    private CPUScheduler cpuScheduler;
+    private LinkedList<Process> outputProcess = new LinkedList<>();
+    private GanttChart gChart;
     
     // End of variables declaration  
 
@@ -76,7 +82,7 @@ public class MainUI extends javax.swing.JFrame {
     private void initComponents() { 
 
         GeneralPanel = new JPanel();
-        animationPanel = new JPanel();
+        
         AnimationTitle = new JLabel();
         SimulateBtn = new JButton();
         ProcessPanel = new JPanel();
@@ -127,6 +133,21 @@ public class MainUI extends javax.swing.JFrame {
         
         
         //Panel for Gantt Chart
+        animationPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (gChart != null && gChart.isTimerStarted()) {
+                    gChart.drawGanttChart(g);
+                }
+            }
+        };
+        JScrollPane scrollPane = new JScrollPane(animationPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        
+        // Add scroll pane to the content pane of the frame
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
         animationPanel.setBackground(new java.awt.Color(255, 255, 255));
         animationPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         animationPanel.setLayout(null);
@@ -161,7 +182,7 @@ public class MainUI extends javax.swing.JFrame {
         
         //Process Panel Title
         ProcessInputLabel.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
-        ProcessInputLabel.setText("Process Input");
+        ProcessInputLabel.setText("Process Input"); 
         ProcessPanel.add(ProcessInputLabel);
         ProcessInputLabel.setBounds(100, 10, 120, 16);
         //end
@@ -175,7 +196,7 @@ public class MainUI extends javax.swing.JFrame {
                 RandRadioBtnActionPerformed(evt);
             }
         }); 
-        ProcessPanel.add(RandRadioBtn); 
+        ProcessPanel.add(RandRadioBtn);  
         RandRadioBtn.setBounds(50, 35, 90, 20);
         //end
          
@@ -188,7 +209,7 @@ public class MainUI extends javax.swing.JFrame {
         ProcessPanel.add(Num_of_Proc_Label);
         Num_of_Proc_Label.setBounds(20, 70, 110, 14);
         
-        numOfProcessTxtField.setText("0");
+        numOfProcessTxtField.setText("1");
         numOfProcessTxtField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 numOfProcessTxtFieldActionPerformed(evt);
@@ -302,6 +323,8 @@ public class MainUI extends javax.swing.JFrame {
         NumOfQueueLbl.setBounds(20, 40, 110, 14);
  
         NumOfQueueComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3" }));
+        ActionEvent initialEvent = new ActionEvent(NumOfQueueComboBox, ActionEvent.ACTION_PERFORMED, "");
+        NumOfQueueComboBoxActionPerformed(initialEvent);
         NumOfQueueComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 NumOfQueueComboBoxActionPerformed(evt);
@@ -357,7 +380,7 @@ public class MainUI extends javax.swing.JFrame {
         //Queue1
 
         //Queue 2
-        Queue2Label.setFont(new java.awt.Font("Arial", 0, 12)); 
+        Queue2Label.setFont(new java.awt.Font("Arial", 0, 12));  
         Queue2Label.setText("Queue 2:");
         Queue2Label.setOpaque(false); 
         Queue2Label.setBounds(75, 150, 60, 14);
@@ -543,6 +566,7 @@ public class MainUI extends javax.swing.JFrame {
                     } else {
                         numOfProcessTxtField.setText(newText);
                         numberOfProcess = value;
+                        //System.out.println(numberOfProcess);
                     }
                 } catch (NumberFormatException e) {
                     evt.consume(); // Consume input if the entered value is not a valid number
@@ -782,6 +806,7 @@ public class MainUI extends javax.swing.JFrame {
     }
 
 	private void SimulateBtnActionPerformed(ActionEvent evt) {
+		System.out.println(numberOfProcess);
         ArrivalTimesTxtField.setInputVerifier(new NumberInputVerifier(0, 20, numberOfProcess, true));
         BurstTimeTxtFld.setInputVerifier(new NumberInputVerifier(1, 20, numberOfProcess, false));
         PriorityTxtFld.setInputVerifier(new NumberInputVerifier(1, 20, numberOfProcess, false));
@@ -791,7 +816,10 @@ public class MainUI extends javax.swing.JFrame {
         boolean priorityValid = PriorityTxtFld.getInputVerifier().verify(PriorityTxtFld);
 
             if (arrivalValid && burstValid && priorityValid) {
-                JOptionPane.showMessageDialog(this, "All entries are valid and matching. Arrival Valid: ");
+            	CPUScheduler cpuSched = new CPUScheduler(this);
+            	outputProcess = cpuSched.getOrderedProcesses();
+            	gChart = new GanttChart(getAnimationPanel(), outputProcess);
+            	gChart.startSimulation();
             } else {
                 JOptionPane.showMessageDialog(this, "Mismatch or invalid entries in one of the fields. \n Arrival Time (0-20) only separated by spaces. \n Burst Time (1-20) only separated by spaces. \n Priority (1-20) only separated by spaces \n Arrival Valid: "+arrivalValid+ " Burst Valid: "+burstValid+" Priority Valid: "+priorityValid);
             }		
@@ -835,7 +863,9 @@ public class MainUI extends javax.swing.JFrame {
     public int getQueue3Quantum(){
         return Queue3Quantum;
     }
-
+    public JPanel getAnimationPanel() {
+    	return animationPanel;
+    }
 }
 
 class NumberInputVerifier extends InputVerifier {
@@ -866,7 +896,6 @@ class NumberInputVerifier extends InputVerifier {
         if (parts.length > maxEntries) return false;
 
         for (String part : parts) {
-            System.out.println(part);
             if (!part.isEmpty()) {
                 try {
                     int value = Integer.parseInt(part);
