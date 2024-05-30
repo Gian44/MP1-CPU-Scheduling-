@@ -48,7 +48,6 @@ public class MLFQScheduler {
                     if (!currentQueueIsEmpty(i))  {
                         boolean higherProcessArrived = false;
 
-
                         if (algorithms.get(i).equalsIgnoreCase("SJF") ||
                         algorithms.get(i).equalsIgnoreCase("SRTF")) {
                             sortProcessQueueByRemainingTIme(queues.get(i));
@@ -60,12 +59,18 @@ public class MLFQScheduler {
                         else if (algorithms.get(i).equalsIgnoreCase("FCFS")) {
                             sortProcessQueueByArrivalTime(queues.get(i));
                         }
+                        else if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                            if (queueInfos.get(i).firstTimeRobinSet()) {
+                                queueInfos.get(i).setRobinTimeQueue(timeQuantum);
+                                queueInfos.get(i).robinFlip();
+                            }
+                        }
 
                         Process currentProcess = getCurrentProcess(i);
                         int runTime = Math.min(remainingCPUTime, currentProcess.getRemainingTime());
                         runTime = Math.min(runTime, currentProcess.getAllocatedTime());
                         if (algorithms.get(i).equalsIgnoreCase("Robin")) {
-                            runTime = Math.min(runTime, timeQuantum);
+                            runTime = Math.min(runTime, queueInfos.get(i).getRobinRemainingTimeQueue());
                         }
                         
                         while (runTime > 0) {
@@ -84,11 +89,15 @@ public class MLFQScheduler {
                             time++;
                             remainingCPUTime--;
                             runTime--;
+                            queueInfos.get(i).decrementRobinRemainingTimeQueue();
                         }
 
                         if (currentProcess.hasFinishedExecution()) { // Completion
                             computeTimeStatistics(currentProcess);
                             listOfCompletedProcesses.add(currentProcess);
+                            if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                                queueInfos.get(i).robinFlip();
+                            }
                         }
                         else if (currentProcess.noMoreAllocatedTime() 
                         && i + 1 < numberOfQueues 
@@ -105,7 +114,18 @@ public class MLFQScheduler {
                             queues.get(i - 1).add(currentProcess);
                         } 
                         else { // Retention
-                            queues.get(i).add(currentProcess);
+                            if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                                if (!queueInfos.get(i).noMoreRobinRemainingTimeQueue()) {
+                                    addToFront(queues.get(i), currentProcess);
+                                }
+                                else {
+                                    queueInfos.get(i).robinFlip();
+                                    queues.get(i).add(currentProcess);
+                                }
+                            }
+                            else {
+                                queues.get(i).add(currentProcess);
+                            }
                         }
                     }
                     else {
@@ -156,7 +176,6 @@ public class MLFQScheduler {
         processes.add(new Process(4, 8, 10, 8));
         return processes;
     }
-
     private void sortProcessQueueByArrivalTime(Queue<Process> processes) {
         ArrayList<Process> list = new ArrayList<>(processes);
         list.sort(Comparator.comparingInt(Process::getArrivalTime));
@@ -210,5 +229,16 @@ public class MLFQScheduler {
         process.getWaitingTime();
         process.getTurnaroundTime();
         process.getResponseTime();
+    }
+    private void addToFront(Queue<Process> processes, Process process) {
+        // Convert the queue to a list
+        ArrayList<Process> list = new ArrayList<>(processes);
+        
+        // Add the new element to the front of the list
+        list.add(0, process);
+        
+        // Clear the queue and add all elements from the list back to the queue
+        processes.clear();
+        processes.addAll(list);
     }
 }
