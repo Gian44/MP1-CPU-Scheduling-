@@ -102,5 +102,12 @@ public class Process {
         return allocatedTime == 0;
     }
 
-    
+    public String toString() {
+		return "Process ID: "+processId+ 
+				" Completion Time: " +completionTime+ 
+				" Waiting Time: " +getWaitingTime()+
+				" Turnaround Time: " +getTurnaroundTime()+
+				" Response Time: " +getResponseTime();
+    	
+    }
 }

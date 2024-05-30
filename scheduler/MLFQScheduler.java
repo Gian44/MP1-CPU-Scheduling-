@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 import algorithms.Process;
+import source.ExecutionStep;
 
 public class MLFQScheduler {
     private ArrayList<Queue<Process>> queues = new ArrayList<>();;
@@ -16,6 +17,7 @@ public class MLFQScheduler {
     private int timeQuantum;
     private LinkedList<Process> listOfIncomingProcesses;
     private LinkedList<Process> listOfCompletedProcesses = new LinkedList<>();
+    private LinkedList<ExecutionStep> executionSequence = new LinkedList<>();
 
     public MLFQScheduler(LinkedList<Process> listOfIncomingProcesses, ArrayList<String> algorithms, int numberOfQueues) {
         this.listOfIncomingProcesses = listOfIncomingProcesses;
@@ -48,18 +50,18 @@ public class MLFQScheduler {
                     if (!currentQueueIsEmpty(i))  {
                         boolean higherProcessArrived = false;
 
-                        if (algorithms.get(i).equalsIgnoreCase("SJF") ||
-                        algorithms.get(i).equalsIgnoreCase("SRTF")) {
+                        if (algorithms.get(i).equalsIgnoreCase("Shortest Job First") ||
+                        algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
                             sortProcessQueueByRemainingTIme(queues.get(i));
                         }
-                        else if (algorithms.get(i).equalsIgnoreCase("Prio") ||
-                        algorithms.get(i).equalsIgnoreCase("NonPrio")) {
+                        else if (algorithms.get(i).equalsIgnoreCase("Priority (Preemptive)") ||
+                        algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
                             sortProcessQueueByPriority(queues.get(i));
                         }
-                        else if (algorithms.get(i).equalsIgnoreCase("FCFS")) {
+                        else if (algorithms.get(i).equalsIgnoreCase("First Come First Serve")) {
                             sortProcessQueueByArrivalTime(queues.get(i));
                         }
-                        else if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                        else if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                             if (queueInfos.get(i).firstTimeRobinSet()) {
                                 queueInfos.get(i).setRobinTimeQueue(timeQuantum);
                                 queueInfos.get(i).robinFlip();
@@ -69,14 +71,14 @@ public class MLFQScheduler {
                         Process currentProcess = getCurrentProcess(i);
                         int runTime = Math.min(remainingCPUTime, currentProcess.getRemainingTime());
                         runTime = Math.min(runTime, currentProcess.getAllocatedTime());
-                        if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                        if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                             runTime = Math.min(runTime, queueInfos.get(i).getRobinRemainingTimeQueue());
                         }
                         
                         while (runTime > 0) {
                             addProcessToQueue(0);
-                            if (algorithms.get(i).equalsIgnoreCase("SRTF") || 
-                            algorithms.get(i).equalsIgnoreCase("NonPrio")) {
+                            if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First") || 
+                            algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
                                 sortProcessQueueByRemainingTIme(queues.get(0));
                                 if (higherProcessArrived(currentProcess, algorithms.get(i))) {
                                     higherProcessArrived = true;
@@ -95,7 +97,7 @@ public class MLFQScheduler {
                         if (currentProcess.hasFinishedExecution()) { // Completion
                             computeTimeStatistics(currentProcess);
                             listOfCompletedProcesses.add(currentProcess);
-                            if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                            if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                                 queueInfos.get(i).robinFlip();
                             }
                         }
@@ -114,7 +116,7 @@ public class MLFQScheduler {
                             queues.get(i - 1).add(currentProcess);
                         } 
                         else { // Retention
-                            if (algorithms.get(i).equalsIgnoreCase("Robin")) {
+                            if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                                 if (!queueInfos.get(i).noMoreRobinRemainingTimeQueue()) {
                                     addToFront(queues.get(i), currentProcess);
                                 }
@@ -141,8 +143,8 @@ public class MLFQScheduler {
         if (queues.get(0).peek() == null) {
             return false;
         }
-        return algo.equalsIgnoreCase("SJF") ||
-        algo.equalsIgnoreCase("SRTF") ? 
+        return algo.equalsIgnoreCase("Shortest Job First") ||
+        algo.equalsIgnoreCase("Shortest Remaining Time First") ? 
         queues.get(0).peek().getRemainingTime() < process.getRemainingTime() :
         queues.get(0).peek().getPriority() > process.getPriority();
     }
@@ -153,7 +155,7 @@ public class MLFQScheduler {
         currentProcess.setAllocatedTime(queueInfos.get(i).getTimeQuantum());
         return currentProcess;
     }
-
+    /*
     public static void main(String[] args) {
         ArrayList<String> algorithms = new ArrayList<>();
         algorithms.add("Robin");
@@ -175,7 +177,8 @@ public class MLFQScheduler {
         processes.add(new Process(3, 1, 9, 3));
         processes.add(new Process(4, 8, 10, 8));
         return processes;
-    }
+    }*/
+
     private void sortProcessQueueByArrivalTime(Queue<Process> processes) {
         ArrayList<Process> list = new ArrayList<>(processes);
         list.sort(Comparator.comparingInt(Process::getArrivalTime));
@@ -240,5 +243,12 @@ public class MLFQScheduler {
         // Clear the queue and add all elements from the list back to the queue
         processes.clear();
         processes.addAll(list);
+    }
+
+    public LinkedList<ExecutionStep> executionSequence(){
+    	return executionSequence;
+    }
+    public LinkedList<Process> getListOfCompletedProcess(){
+    	return listOfCompletedProcesses;
     }
 }

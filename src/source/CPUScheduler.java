@@ -1,24 +1,21 @@
-package src.source;
+package source;
 
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+
+import scheduler.MLFQScheduler;
 import algorithms.Process;
 
 public class CPUScheduler {
     private LinkedList<Process> processes = new LinkedList<>();
     private String prioOrder;
     private int NumOfQueues;
-    private String Queue1Algo;
-    private int Queue1Quantum;
-    private String Queue2Algo;
-    private int Queue2Quantum;
-    private String Queue3Algo;
-    private int Queue3Quantum;
-    //PremptiveScheduler preempAlgo;
-    private LinkedList<Process> output;
-    private GanttChart gChart;
+    private MLFQScheduler mlfqsched;
+    private LinkedList<ExecutionStep> output;
+    private LinkedList<Process> listOfCompletedProcesses;
+    private ArrayList<String> algorithms = new ArrayList<>();
 
     public CPUScheduler(MainUI mainUI) {
         // Extract data from MainUI
@@ -35,7 +32,7 @@ public class CPUScheduler {
         int[] priorityArray = parseStringToIntArray(priorities, numOfProcess);
  
         for (int i = 0; i < numOfProcess; i++) {
-            processes.add(new Process(""+(i+1), arrivalTimeArray[i], burstTimeArray[i], priorityArray[i]));
+            processes.add(new Process(i+1, burstTimeArray[i], arrivalTimeArray[i], priorityArray[i]));
             System.out.println("i: " +i);
         }
         // Sort processes by arrival time
@@ -43,27 +40,94 @@ public class CPUScheduler {
         System.out.println(NumOfQueues);
         checkNumberOfQueues(NumOfQueues, mainUI);
         printProcesses();
+        listofCompletedProcess();
     }  
 
     private void checkNumberOfQueues(int NumOfQueues, MainUI mainUI) {
-        if (NumOfQueues >= 1) {
+        if (NumOfQueues == 1) {
             String queue1Algo = mainUI.getQueue1Algo();
-            int queue1Quantum = mainUI.getQueue1Quantum();
+            algorithms.add(queue1Algo);
+            int queueQuantum = mainUI.getQueueQuantum();
             System.out.println(queue1Algo);
+            mlfqsched = new MLFQScheduler(processes, algorithms, 1, queueQuantum);
+            mlfqsched.simulate(); 
+            output = mlfqsched.executionSequence();
+            
         }
-        if (NumOfQueues >= 2) { 
+        if (NumOfQueues == 2) { 
+        	String queue1Algo = mainUI.getQueue1Algo();
+            algorithms.add(queue1Algo);
+            
             String queue2Algo = mainUI.getQueue2Algo();
-            int queue2Quantum = mainUI.getQueue2Quantum();
+            algorithms.add(queue2Algo);
+            
+            int queueQuantum = mainUI.getQueueQuantum(); 
+            
+            mlfqsched = new MLFQScheduler(processes, algorithms, 2, queueQuantum);
+            mlfqsched.simulate(); 
+            output = mlfqsched.executionSequence();
             
         }
-        if (NumOfQueues >= 3) {
+        if (NumOfQueues == 3) {
+        	String queue1Algo = mainUI.getQueue1Algo();
+            algorithms.add(queue1Algo);
+            
+            int queueQuantum = mainUI.getQueueQuantum();
+            
+            String queue2Algo = mainUI.getQueue2Algo();
+            algorithms.add(queue2Algo);
+            
+            
             String queue3Algo = mainUI.getQueue3Algo();
-            int queue3Quantum = mainUI.getQueue3Quantum();
+            algorithms.add(queue3Algo);
             
-        }
-        
+            mlfqsched = new MLFQScheduler(processes, algorithms, 3, queueQuantum);
+            mlfqsched.simulate(); 
+            output = mlfqsched.executionSequence();
+            
+        } 
+        listOfCompletedProcesses = mlfqsched.getListOfCompletedProcess();
+        AverageWaitingTime(mainUI);
+        AverageTurnAroundTime(mainUI);
+        AverageResponseTime(mainUI);
     }
-
+    
+    public void listofCompletedProcess() {
+    	for(Process process: listOfCompletedProcesses) {
+    		System.out.println(process);
+    	}
+    }
+    
+    public void AverageWaitingTime(MainUI mainUI) {
+    	int sum = 0;
+    	double average = 0;
+    	for(Process process: listOfCompletedProcesses) {
+    		sum += process.getWaitingTime();
+    	}
+    	average = (double) sum / listOfCompletedProcesses.size();
+    	mainUI.getAverageWT().setText(""+String.format("%.2f", average));
+    }
+    
+    public void AverageTurnAroundTime(MainUI mainUI) {
+    	int sum = 0;
+    	double average = 0;
+    	for(Process process: listOfCompletedProcesses) {
+    		sum += process.getTurnaroundTime();
+    	}
+    	average = (double) sum / listOfCompletedProcesses.size();
+    	mainUI.getAverageTT().setText(""+String.format("%.2f", average));
+    }
+    
+    public void AverageResponseTime(MainUI mainUI) {
+    	int sum = 0;
+    	double average = 0;
+    	for(Process process: listOfCompletedProcesses) {
+    		sum += process.getResponseTime();
+    	}
+    	average = (double) sum / listOfCompletedProcesses.size();
+    	mainUI.getAverageRT().setText(""+String.format("%.2f", average));
+    }
+    
     private int[] parseStringToIntArray(String input, int numOfProcess) {
         String[] parts = input.trim().split("\\s+");
         int[] array = new int[numOfProcess];
@@ -83,7 +147,7 @@ public class CPUScheduler {
         });
     }
 
-    public LinkedList<Process> getOrderedProcesses() {
+    public LinkedList<ExecutionStep> getOrderedProcesses() {
         return output;
     }
 
@@ -92,7 +156,8 @@ public class CPUScheduler {
     }
     
     public void printProcesses() {
-        for (Process process : output) {
+    	System.out.println("Output");
+        for (ExecutionStep process : output) {
             System.out.println(process);
         }
     }

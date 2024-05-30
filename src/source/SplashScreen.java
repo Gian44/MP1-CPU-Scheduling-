@@ -1,4 +1,4 @@
-package src.source;
+package source;
 import java.util.TimerTask;
 import java.util.Timer;
 
@@ -6,6 +6,10 @@ import javax.swing.*;
 
 public class SplashScreen extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1844283973051289842L;
 	// Variables declaration - do not modify                     
     private JLabel AppTitle;
     private JLabel AnimationLabel;
@@ -45,7 +49,7 @@ public class SplashScreen extends JFrame {
                     }
                 });
             }
-        }, 100);
+        }, 2000);
     }
 
     
@@ -97,6 +101,7 @@ public class SplashScreen extends JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SplashScreen().setVisible(true);
+                
             }
         });
     }
