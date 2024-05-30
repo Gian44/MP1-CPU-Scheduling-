@@ -47,6 +47,8 @@ public class MLFQScheduler {
                     addProcessToQueue(0);
                     if (!currentQueueIsEmpty(i))  {
                         boolean higherProcessArrived = false;
+
+
                         if (algorithms.get(i).equalsIgnoreCase("SJF") ||
                         algorithms.get(i).equalsIgnoreCase("SRTF")) {
                             sortProcessQueueByRemainingTIme(queues.get(i));
@@ -55,6 +57,10 @@ public class MLFQScheduler {
                         algorithms.get(i).equalsIgnoreCase("NonPrio")) {
                             sortProcessQueueByPriority(queues.get(i));
                         }
+                        else if (algorithms.get(i).equalsIgnoreCase("FCFS")) {
+                            sortProcessQueueByArrivalTime(queues.get(i));
+                        }
+
                         Process currentProcess = getCurrentProcess(i);
                         int runTime = Math.min(remainingCPUTime, currentProcess.getRemainingTime());
                         runTime = Math.min(runTime, currentProcess.getAllocatedTime());
@@ -130,14 +136,12 @@ public class MLFQScheduler {
 
     public static void main(String[] args) {
         ArrayList<String> algorithms = new ArrayList<>();
-        algorithms.add("Robin");
-        algorithms.add("Prio");
         algorithms.add("FCFS");
-        MLFQScheduler test = new MLFQScheduler(createTestProcesses(), algorithms, 3);
+        MLFQScheduler test = new MLFQScheduler(createTestProcesses(), algorithms, 1);
         for (String algorithm : algorithms) {
             if (algorithm.equalsIgnoreCase("Robin")) {
                 int timeQuantum = 2;
-                test = new MLFQScheduler(createTestProcesses(), algorithms, 3, timeQuantum);
+                test = new MLFQScheduler(createTestProcesses(), algorithms, 1, timeQuantum);
                 break;
             }
         }
@@ -146,13 +150,19 @@ public class MLFQScheduler {
 
     private static LinkedList<Process> createTestProcesses() {
         LinkedList<Process> processes = new LinkedList<>();
-        processes.add(new Process(1, 3, 5, 3)); // Process ID, Arrival Time, Burst Time, Priority
-        processes.add(new Process(2, 5, 3, 5));
-        processes.add(new Process(3, 7, 8, 4));
-        processes.add(new Process(4, 9, 6, 2));
+        processes.add(new Process(1, 7, 3, 2)); // Process ID, Arrival Time, Burst Time, Priority
+        processes.add(new Process(2, 2, 4, 1));
+        processes.add(new Process(3, 1, 9, 3));
+        processes.add(new Process(4, 8, 10, 8));
         return processes;
     }
 
+    private void sortProcessQueueByArrivalTime(Queue<Process> processes) {
+        ArrayList<Process> list = new ArrayList<>(processes);
+        list.sort(Comparator.comparingInt(Process::getArrivalTime));
+        processes.clear();
+        processes.addAll(list);
+    }
     private void sortProcessQueueByPriority(Queue<Process> processes) {
         ArrayList<Process> list = new ArrayList<>(processes);
         list.sort((p1, p2) -> Integer.compare(p2.getPriority(), p1.getPriority())); // Reverse the comparison
