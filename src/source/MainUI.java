@@ -8,6 +8,8 @@ import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Random;
 
+import src.source.GanttChart;
+
 import javax.swing.*;
 
 @SuppressWarnings("serial")
