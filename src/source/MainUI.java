@@ -218,6 +218,8 @@ public class MainUI extends javax.swing.JFrame {
 
         Queue3AlgoOptions.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "First Come First Serve", "Shortest Job First", "Shortest Remaining Time First", "Priority (Preemptive)", "Priority (Non-preemptive)", "Round Robin" }));
         //MultilevelQueuePanel.add(Queue3AlgoOptions);
+        ActionEvent initialEvent3 = new ActionEvent(Queue3AlgoOptions, ActionEvent.ACTION_PERFORMED, "");
+        Queue3AlgoOptionsActionPerformed(initialEvent3);
         Queue3AlgoOptions.setBounds(140, 160, 191, 22);
         Queue3AlgoOptions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,6 +234,8 @@ public class MainUI extends javax.swing.JFrame {
         Queue1Label.setBounds(75, 80, 50, 14);
 
         Queue1AlgoOptions.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "First Come First Serve", "Shortest Job First", "Shortest Remaining Time First", "Priority (Preemptive)", "Priority (Non-preemptive)", "Round Robin" }));
+        ActionEvent initialEvent1 = new ActionEvent(Queue1AlgoOptions, ActionEvent.ACTION_PERFORMED, "");
+        Queue1AlgoOptionsActionPerformed(initialEvent1);
         Queue1AlgoOptions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Queue1AlgoOptionsActionPerformed(evt);
@@ -247,6 +251,8 @@ public class MainUI extends javax.swing.JFrame {
         Queue2Label.setBounds(70, 120, 60, 14);
 
         Queue2AlgoOptions.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "First Come First Serve", "Shortest Job First", "Shortest Remaining Time First", "Priority (Preemptive)", "Priority (Non-preemptive)", "Round Robin" }));
+        ActionEvent initialEvent2 = new ActionEvent(Queue2AlgoOptions, ActionEvent.ACTION_PERFORMED, "");
+        Queue2AlgoOptionsActionPerformed(initialEvent2);
         Queue2AlgoOptions.setOpaque(false); 
         Queue2AlgoOptions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
