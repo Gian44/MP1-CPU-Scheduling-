@@ -639,12 +639,13 @@ public class MainUI extends javax.swing.JFrame {
         boolean arrivalValid = ArrivalTimesTxtField.getInputVerifier().verify(ArrivalTimesTxtField);
         boolean burstValid = BurstTimeTxtFld.getInputVerifier().verify(BurstTimeTxtFld);
         boolean priorityValid = PriorityTxtFld.getInputVerifier().verify(PriorityTxtFld);
-
+        
             if (arrivalValid && burstValid && priorityValid) {
             	CPUScheduler cpuSched = new CPUScheduler(this);
             	outputProcess = cpuSched.getOrderedProcesses();
             	gChart = new GanttChart(getAnimationPanel(), getTimePanel(),getScrollPane(),  outputProcess);
             	gChart.startSimulation(); 
+                //gChart.resetScrollPane();
             } else {
                 JOptionPane.showMessageDialog(this, "Mismatch or invalid entries in one of the fields. \n Arrival Time (0-20) only separated by spaces. \n Burst Time (1-20) only separated by spaces. \n Priority (1-20) only separated by spaces \n Arrival Valid: "+arrivalValid+ " Burst Valid: "+burstValid+" Priority Valid: "+priorityValid);
             }		 

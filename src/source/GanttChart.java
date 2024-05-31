@@ -25,6 +25,8 @@ public class GanttChart {
         this.executionSequence = executionSequence;
         this.scrollPane = scrollPane;
         this.timePanel = timePanel;
+        resetAnimationPanelSize(1030, 200);
+        resetScrollPane();
         initializeProcessColors();
         setupTimerTask();
     }
@@ -57,7 +59,7 @@ public class GanttChart {
             public void run() {
             	
                 if (currentStepIndex < executionSequence.size()) {
-                	System.out.println("Started to expand");
+                	//System.out.println("Started to expand");
                     updateScrollPane();
                     animationPanel.repaint();
                     currentStepIndex++; 
@@ -79,7 +81,7 @@ public class GanttChart {
             drawnWidth = (lastTime + 1) * timeUnitWidth;
         }
         
-        System.out.println("Current width: " + (animationPanel.getWidth() - drawnWidth) + " Additional Threshold: " + additionalSpaceThreshold);
+        //System.out.println("Current width: " + (animationPanel.getWidth() - drawnWidth) + " Additional Threshold: " + additionalSpaceThreshold);
         if (animationPanel.getWidth() - drawnWidth < additionalSpaceThreshold) {
         	//System.out.println("New Width: " +drawnWidth + additionalSpaceThreshold);
             animationPanel.setPreferredSize(new Dimension(drawnWidth + additionalSpaceThreshold, animationPanel.getHeight()));
@@ -152,6 +154,22 @@ public class GanttChart {
             FontMetrics fm = g2d.getFontMetrics();
             int stringWidth = fm.stringWidth(currentTimeString);
             g2d.drawString(currentTimeString, timePanel.getWidth() - stringWidth - 50, fm.getHeight() + 6);
+        }
+    }
+
+    public void resetScrollPane() {
+        if (scrollPane != null) {
+            SwingUtilities.invokeLater(() -> {
+                JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
+                horizontalBar.setValue(0); // Set scrollbar position to initial
+            });
+        }
+    }
+
+    private void resetAnimationPanelSize(int width, int height) {
+        if (animationPanel != null) {
+            animationPanel.setPreferredSize(new Dimension(width, height));
+            animationPanel.revalidate();
         }
     }
 }
