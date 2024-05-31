@@ -127,7 +127,7 @@ public class MLFQScheduler {
                                 }
                             }
                             else {
-                                queues.get(i).add(currentProcess);
+                                addToFront(queues.get(i), currentProcess);
                             }
                         }
                     }
