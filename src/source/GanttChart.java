@@ -3,8 +3,8 @@ package source;
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.HashMap;
 import java.util.Map;
 import algorithms.Process;
@@ -14,6 +14,7 @@ public class GanttChart {
     private Map<Process, Color> processColors;
     private int currentStepIndex = 0;
     private Timer timer;
+    private TimerTask timerTask;
     private JPanel animationPanel;
     private JScrollPane scrollPane;
     private boolean isTimerStarted = false;
@@ -23,9 +24,9 @@ public class GanttChart {
         this.executionSequence = executionSequence;
         this.scrollPane = scrollPane;
         initializeProcessColors();
-        setupTimer();
+        setupTimerTask();
     }
-
+ 
     private void initializeProcessColors() {
         processColors = new HashMap<>();
         int numberOfProcesses = executionSequence.stream()
@@ -47,46 +48,57 @@ public class GanttChart {
         return Color.getHSBColor(hue, 0.7f, 0.9f); // Using high saturation and brightness for vibrant colors
     }
 
-    private void setupTimer() {
-        timer = new Timer(1000, new ActionListener() {
+    private void setupTimerTask() {
+        timer = new Timer();
+        timerTask = new TimerTask() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Timer");
+            public void run() {
+            	
                 if (currentStepIndex < executionSequence.size()) {
-                	updateScrollPane();
+                	System.out.println("Started to expand");
+                    updateScrollPane();
                     animationPanel.repaint();
-                    currentStepIndex++;
-                    
+                    currentStepIndex++; 
                 } else {
-                    timer.stop();
+                    timer.cancel();
                 }
             }
-        });
+        };
     }
-    
-    
+
     private void updateScrollPane() {
         int timeUnitWidth = 30;
         int additionalSpaceThreshold = 280;
-        int drawnWidth = (currentStepIndex + 1) * timeUnitWidth;
 
+        // Calculate the drawn width based on actual time units covered
+        int drawnWidth = 0;
+        if (currentStepIndex > 0) {
+            int lastTime = executionSequence.get(currentStepIndex - 1).getTime();
+            drawnWidth = (lastTime + 1) * timeUnitWidth;
+        }
+        
+        System.out.println("Current width: " + (animationPanel.getWidth() - drawnWidth) + " Additional Threshold: " + additionalSpaceThreshold);
         if (animationPanel.getWidth() - drawnWidth < additionalSpaceThreshold) {
+        	//System.out.println("New Width: " +drawnWidth + additionalSpaceThreshold);
             animationPanel.setPreferredSize(new Dimension(drawnWidth + additionalSpaceThreshold, animationPanel.getHeight()));
             animationPanel.revalidate();
         }
-
+        
         if (scrollPane != null) {
-            JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
-            horizontalBar.setValue(horizontalBar.getMaximum());
+            SwingUtilities.invokeLater(() -> {
+                JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
+                horizontalBar.setValue(horizontalBar.getMaximum());
+            });
         }
+        
     }
 
     public void startSimulation() {
         if (!isTimerStarted) {
-            timer.start();
+            timer.scheduleAtFixedRate(timerTask, 0, 1000);
             isTimerStarted = true; // Set the flag to true when the timer starts
         }
-    }
+    } 
 
     public boolean isTimerStarted() {
         return isTimerStarted;
@@ -112,7 +124,7 @@ public class GanttChart {
             g.setColor(Color.BLACK);
             g.drawRect(processStartX, height / 2 - barHeight / 2, 30, barHeight);
             g.drawString(String.valueOf(process.getProcessId()), processStartX + processLength / 2 - 10, height / 2 + 5);
-        } 
+        }
 
         // Draw the current time indicator 
         g.setColor(Color.RED);
@@ -127,5 +139,14 @@ public class GanttChart {
         FontMetrics fm = g.getFontMetrics();
         int stringWidth = fm.stringWidth(currentTimeString);
         g.drawString(currentTimeString, width - stringWidth - 50, fm.getHeight());
+        
+     // Draw AnimationTitle centered
+        Font titleFont = new Font("Arial Black", Font.BOLD, 12);
+        FontMetrics titleMetrics = g.getFontMetrics(titleFont);
+        int titleWidth = titleMetrics.stringWidth("Gantt Chart of Process Execution");
+        int titleX = (width - titleWidth) / 2;
+        int titleY = 20; // Adjust as needed
+        g.setFont(titleFont);
+        g.drawString("Gantt Chart of Process Execution", titleX, titleY);
     }
 }

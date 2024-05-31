@@ -43,7 +43,7 @@ public class MainUI extends javax.swing.JFrame {
     private JLabel Queue2Label;
     private JComboBox<String> Queue3AlgoOptions;
     private JLabel Queue3Label;
-    private JRadioButton RandRadioBtn;
+    private JButton RandRadioBtn;
     private JPanel animationPanel;
     private JTextField numOfProcessTxtField;
     private static Random randNum;
@@ -68,10 +68,9 @@ public class MainUI extends javax.swing.JFrame {
                        
     private void initComponents() {
 
-        RandRadioBtn = new javax.swing.JRadioButton();
+        RandRadioBtn = new javax.swing.JButton();
         GeneralPanel = new javax.swing.JPanel();
         ProcessPanel = new javax.swing.JPanel();
-        RandRadioBtn = new javax.swing.JRadioButton();
         Num_of_Proc_Label = new javax.swing.JLabel();
         ArrivalTimeLabel = new javax.swing.JLabel();
         BurstTimeLabel = new javax.swing.JLabel();
@@ -139,7 +138,7 @@ public class MainUI extends javax.swing.JFrame {
             } 
         }; 
         ProcessPanel.add(RandRadioBtn);
-        RandRadioBtn.setBounds(40, 40, 90, 20);
+        RandRadioBtn.setBounds(35, 35, 79, 20); 
         RandRadioBtn.setSelected(false);
 
         Num_of_Proc_Label.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
@@ -360,11 +359,11 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-        AnimationTitle.setFont(new java.awt.Font("Arial Black", 1, 12)); // NOI18N
-        AnimationTitle.setText("Gantt Chart of Process Execution");
-        AnimationTitle.setAlignmentX(0.5f);
-        animationPanel.setLayout(new OverlayLayout(animationPanel));
-        animationPanel.add(AnimationTitle);
+        //AnimationTitle.setFont(new java.awt.Font("Arial Black", 1, 12)); // NOI18N
+        //AnimationTitle.setText("Gantt Chart of Process Execution");
+        //AnimationTitle.setAlignmentX(0.5f);
+        //animationPanel.setLayout(new OverlayLayout(animationPanel));
+        //animationPanel.add(AnimationTitle);
         
         javax.swing.GroupLayout animationPanelLayout = new javax.swing.GroupLayout(animationPanel);
         animationPanel.setLayout(animationPanelLayout);
@@ -407,21 +406,13 @@ public class MainUI extends javax.swing.JFrame {
     /*********    ActionListener Events     ***************/
     
     private void RandRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {                                             
-    	if (RandRadioBtn.isSelected()) {
+        int randomNumber = randNum.nextInt(20) + 1;
+        numberOfProcess = randomNumber;
+        numOfProcessTxtField.setText(Integer.toString(randomNumber));
             
-            int randomNumber = randNum.nextInt(20) + 1;
-            numberOfProcess = randomNumber;
-            numOfProcessTxtField.setText(Integer.toString(randomNumber));
-            
-            generateRandomNumbers(0, randomNumber, ArrivalTimesTxtField);
-            generateRandomNumbers(1, randomNumber, BurstTimeTxtFld);
-            generateRandomNumbers(1,randomNumber, PriorityTxtFld);
-            
-            numOfProcessTxtField.setEditable(!RandRadioBtn.isSelected());
-            ArrivalTimesTxtField.setEditable(!RandRadioBtn.isSelected());
-            BurstTimeTxtFld.setEditable(!RandRadioBtn.isSelected());
-            PriorityTxtFld.setEditable(!RandRadioBtn.isSelected());
-        } 
+        generateRandomNumbers(0, randomNumber, ArrivalTimesTxtField);
+        generateRandomNumbers(1, randomNumber, BurstTimeTxtFld);
+        generateRandomNumbers(1,randomNumber, PriorityTxtFld);
     }  
      
     private void numOfProcessTxtFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                     
