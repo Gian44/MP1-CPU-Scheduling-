@@ -347,20 +347,20 @@ public class MainUI extends javax.swing.JFrame {
         AverageTTLabel.setBounds(30, 175, 150, 14);
 
         AverageWT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageWT.setText("10");
+        AverageWT.setText("0");
         AverageWT.setEditable(false);
         AveragesPanel.add(AverageWT);
         AverageWT.setBounds(60, 45, 80, 22);
 
         AverageRT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageRT.setText("10");
+        AverageRT.setText("0");
         AverageRT.setEditable(false);
         
         AveragesPanel.add(AverageRT);
         AverageRT.setBounds(60, 125, 80, 22);
 
         AverageTT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageTT.setText("10");
+        AverageTT.setText("0");
         AverageTT.setEditable(false);
         AveragesPanel.add(AverageTT);
         AverageTT.setBounds(60, 205, 80, 22);
