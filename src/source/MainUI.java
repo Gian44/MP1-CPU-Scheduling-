@@ -68,6 +68,7 @@ public class MainUI extends javax.swing.JFrame {
     private JScrollPane jScrollPane1;
     private JPanel TitlePanel;
     private JPanel TimePanel;
+    private int roundRobinQueueCount = 0;
     // End of variables declaration  
 
     /**
@@ -518,7 +519,19 @@ public class MainUI extends javax.swing.JFrame {
 
     
     private void handleAlgorithmSelection(String selectedAlgorithm) {
+        
+
         if (selectedAlgorithm.equals("Round Robin")) {
+            roundRobinQueueCount++;
+            System.out.println("RoundRob: "+roundRobinQueueCount);
+        }else{
+            if(roundRobinQueueCount > 0){
+                roundRobinQueueCount--;
+                System.out.println("RoundRob: "+roundRobinQueueCount);
+            }
+        }
+    
+        if (roundRobinQueueCount > 0) {
             if (!MultilevelQueuePanel.isAncestorOf(QueueQuantumLbl)) {
                 MultilevelQueuePanel.add(QueueQuantumLbl);
             }
@@ -529,6 +542,7 @@ public class MainUI extends javax.swing.JFrame {
             MultilevelQueuePanel.remove(QueueQuantumLbl);
             MultilevelQueuePanel.remove(QueueQuantumInput);
         }
+    
         revalidate();
         repaint();
     }
