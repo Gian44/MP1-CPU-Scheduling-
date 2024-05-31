@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Random;
-
 import javax.swing.*;
 
 @SuppressWarnings("serial")
@@ -656,11 +655,22 @@ public class MainUI extends javax.swing.JFrame {
         
             if (arrivalValid && burstValid && priorityValid) {
             	CPUScheduler cpuSched = new CPUScheduler(this);
-            	outputProcess = cpuSched.getOrderedProcesses();
-            	gChart = new GanttChart(getAnimationPanel(), getTimePanel(),getScrollPane(),  outputProcess);
-            	gChart.startSimulation(); 
-                //gChart.resetScrollPane();
-            } else {
+                outputProcess = cpuSched.getOrderedProcesses();
+                gChart = new GanttChart(getAnimationPanel(), getTimePanel(), getScrollPane(), outputProcess);
+                
+                // Disable the simulate button
+                SimulateBtn.setEnabled(false);
+                
+                // Add a listener to enable the button when drawing is complete
+                gChart.addPropertyChangeListener(event -> { // Renamed the lambda parameter to 'event'
+                    if ("drawingComplete".equals(event.getPropertyName())) {
+                        SimulateBtn.setEnabled(true);
+                    }
+                });
+                
+                gChart.startSimulation();
+            } 
+            else {
                 JOptionPane.showMessageDialog(this, "Mismatch or invalid entries in one of the fields. \n Arrival Time (0-20) only separated by spaces. \n Burst Time (1-20) only separated by spaces. \n Priority (1-20) only separated by spaces \n Arrival Valid: "+arrivalValid+ " Burst Valid: "+burstValid+" Priority Valid: "+priorityValid);
             }		 
 	}  

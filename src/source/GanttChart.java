@@ -8,10 +8,13 @@ import java.util.TimerTask;
 import java.util.HashMap;
 import java.util.Map;
 import algorithms.Process;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 public class GanttChart {
     private LinkedList<ExecutionStep> executionSequence;
     private Map<Process, Color> processColors;
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private int currentStepIndex = 0;
     private Timer timer;
     private TimerTask timerTask;
@@ -19,6 +22,7 @@ public class GanttChart {
     private JScrollPane scrollPane;
     private boolean isTimerStarted = false;
     private JPanel timePanel;
+    private boolean isDone = false;
 
     public GanttChart(JPanel animationPanel, JPanel timePanel, JScrollPane scrollPane, LinkedList<ExecutionStep> executionSequence) {
         this.animationPanel = animationPanel;
@@ -65,6 +69,8 @@ public class GanttChart {
                     currentStepIndex++; 
                 } else {
                     timer.cancel();
+                    isDone = true;
+                    support.firePropertyChange("drawingComplete", false, true); // Notify listeners
                 }
             }
         };
@@ -171,5 +177,16 @@ public class GanttChart {
             animationPanel.setPreferredSize(new Dimension(width, height));
             animationPanel.revalidate();
         }
+    }
+
+    public boolean isDone(){
+        return isDone;
+    }
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
     }
 }
