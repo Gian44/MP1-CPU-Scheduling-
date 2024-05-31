@@ -492,7 +492,7 @@ public class MainUI extends javax.swing.JFrame {
             String newText = currentText + c;
             try {
                 int value = Integer.parseInt(newText);
-                if (value < 1 || value > 15) {
+                if (value < 1 || value > 20) {
                     evt.consume(); // Consume input if the entered number is out of range
                 } else {
                 	numOfProcessTxtField.setText(newText);
