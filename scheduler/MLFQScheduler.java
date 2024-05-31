@@ -58,9 +58,6 @@ public class MLFQScheduler {
                         algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
                             sortProcessQueueByPriority(queues.get(i));
                         }
-                        else if (algorithms.get(i).equalsIgnoreCase("First Come First Serve")) {
-                            sortProcessQueueByArrivalTime(queues.get(i));
-                        }
                         else if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                             if (queueInfos.get(i).firstTimeRobinSet()) {
                                 queueInfos.get(i).setRobinTimeQueue(timeQuantum);
