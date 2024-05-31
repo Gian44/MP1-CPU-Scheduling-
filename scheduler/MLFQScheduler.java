@@ -177,12 +177,6 @@ public class MLFQScheduler {
         return processes;
     }*/
 
-    private void sortProcessQueueByArrivalTime(Queue<Process> processes) {
-        ArrayList<Process> list = new ArrayList<>(processes);
-        list.sort(Comparator.comparingInt(Process::getArrivalTime));
-        processes.clear();
-        processes.addAll(list);
-    }
     private void sortProcessQueueByPriority(Queue<Process> processes) {
         ArrayList<Process> list = new ArrayList<>(processes);
         list.sort((p1, p2) -> Integer.compare(p2.getPriority(), p1.getPriority())); // Reverse the comparison
