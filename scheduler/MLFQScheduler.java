@@ -88,6 +88,7 @@ public class MLFQScheduler {
                             currentProcess.decrementRemainingBurstTime();
                             currentProcess.decrementAllocatedTime();
                             System.out.println("Time: " + time + " - Running Process: " + currentProcess.getProcessId() + " at Queue " + (i + 1));
+                            executionSequence.add(new ExecutionStep(time, currentProcess));
                             time++;
                             remainingCPUTime--;
                             runTime--;
