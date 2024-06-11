@@ -71,7 +71,6 @@ public class MLFQScheduler {
                         }
                         
                         while (runTime > 0) {
-                            addProcessToQueue(0);
                             if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First") || 
                             algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
                                 sortProcessQueueByRemainingTime(queues.get(0));
@@ -87,6 +86,7 @@ public class MLFQScheduler {
                             time++;
                             remainingCPUTime--;
                             runTime--;
+                            addProcessToQueue(0);
                             queueInfos.get(i).decrementRobinRemainingTimeQueue();
                         }
 
