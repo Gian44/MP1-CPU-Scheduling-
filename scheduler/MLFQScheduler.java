@@ -50,12 +50,10 @@ public class MLFQScheduler {
                     if (!currentQueueIsEmpty(i))  {
                         boolean higherProcessArrived = false;
 
-                        if (algorithms.get(i).equalsIgnoreCase("Shortest Job First") ||
-                        algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
+                        if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
                             sortProcessQueueByRemainingTIme(queues.get(i));
                         }
-                        else if (algorithms.get(i).equalsIgnoreCase("Priority (Preemptive)") ||
-                        algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
+                        else if (algorithms.get(i).equalsIgnoreCase("Priority (Preemptive)")) {
                             sortProcessQueueByPriority(queues.get(i));
                         }
                         else if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
@@ -97,6 +95,12 @@ public class MLFQScheduler {
                             listOfCompletedProcesses.add(currentProcess);
                             if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                                 queueInfos.get(i).robinFlip();
+                            }
+                            else if (algorithms.get(i).equalsIgnoreCase("Shortest Job First")) {
+                                sortProcessQueueByRemainingTIme(queues.get(i));
+                            }
+                            else if (algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
+                                sortProcessQueueByPriority(queues.get(i));
                             }
                         }
                         else if (currentProcess.noMoreAllocatedTime() 
