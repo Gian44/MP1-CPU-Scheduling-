@@ -51,7 +51,7 @@ public class MLFQScheduler {
                         boolean higherProcessArrived = false;
 
                         if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
-                            sortProcessQueueByRemainingTIme(queues.get(i));
+                            sortProcessQueueByRemainingTime(queues.get(i));
                         }
                         else if (algorithms.get(i).equalsIgnoreCase("Priority (Preemptive)")) {
                             sortProcessQueueByPriority(queues.get(i));
@@ -74,7 +74,7 @@ public class MLFQScheduler {
                             addProcessToQueue(0);
                             if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First") || 
                             algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
-                                sortProcessQueueByRemainingTIme(queues.get(0));
+                                sortProcessQueueByRemainingTime(queues.get(0));
                                 if (higherProcessArrived(currentProcess, algorithms.get(i))) {
                                     higherProcessArrived = true;
                                     break;
@@ -97,7 +97,7 @@ public class MLFQScheduler {
                                 queueInfos.get(i).robinFlip();
                             }
                             else if (algorithms.get(i).equalsIgnoreCase("Shortest Job First")) {
-                                sortProcessQueueByRemainingTIme(queues.get(i));
+                                sortProcessQueueByRemainingTime(queues.get(i));
                             }
                             else if (algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
                                 sortProcessQueueByPriority(queues.get(i));
@@ -183,16 +183,30 @@ public class MLFQScheduler {
 
     private void sortProcessQueueByPriority(Queue<Process> processes) {
         ArrayList<Process> list = new ArrayList<>(processes);
-        list.sort((p1, p2) -> Integer.compare(p2.getPriority(), p1.getPriority())); // Reverse the comparison
-        processes.clear();
-        processes.addAll(list);
-    }    
-    private void sortProcessQueueByRemainingTIme(Queue<Process> processes) {
-        ArrayList<Process> list = new ArrayList<>(processes);
-        list.sort(Comparator.comparingInt(Process::getRemainingTime));
+        list.sort((p1, p2) -> {
+            int priorityComparison = Integer.compare(p2.getPriority(), p1.getPriority());
+            if (priorityComparison == 0) {
+                return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
+            }
+            return priorityComparison;
+        });
         processes.clear();
         processes.addAll(list);
     }
+    
+    private void sortProcessQueueByRemainingTime(Queue<Process> processes) {
+        ArrayList<Process> list = new ArrayList<>(processes);
+        list.sort((p1, p2) -> {
+            int remainingTimeComparison = Integer.compare(p1.getRemainingTime(), p2.getRemainingTime());
+            if (remainingTimeComparison == 0) {
+                return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
+            }
+            return remainingTimeComparison;
+        });
+        processes.clear();
+        processes.addAll(list);
+    }
+    
     private boolean thereAreProcessesToBeExecuted() {
         for (Queue<Process> queue: queues) {
             if (!queue.isEmpty()) {
