@@ -8,21 +8,29 @@ import java.util.TimerTask;
 import java.util.HashMap;
 import java.util.Map;
 import algorithms.Process;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 public class GanttChart {
     private LinkedList<ExecutionStep> executionSequence;
     private Map<Process, Color> processColors;
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private int currentStepIndex = 0;
     private Timer timer;
     private TimerTask timerTask;
     private JPanel animationPanel;
     private JScrollPane scrollPane;
     private boolean isTimerStarted = false;
+    private JPanel timePanel;
+    private boolean isDone = false;
 
-    public GanttChart(JPanel animationPanel, JScrollPane scrollPane, LinkedList<ExecutionStep> executionSequence) {
+    public GanttChart(JPanel animationPanel, JPanel timePanel, JScrollPane scrollPane, LinkedList<ExecutionStep> executionSequence) {
         this.animationPanel = animationPanel;
         this.executionSequence = executionSequence;
         this.scrollPane = scrollPane;
+        this.timePanel = timePanel;
+        resetAnimationPanelSize(1030, 200);
+        resetScrollPane();
         initializeProcessColors();
         setupTimerTask();
     }
@@ -55,12 +63,14 @@ public class GanttChart {
             public void run() {
             	
                 if (currentStepIndex < executionSequence.size()) {
-                	System.out.println("Started to expand");
+                	//System.out.println("Started to expand");
                     updateScrollPane();
                     animationPanel.repaint();
                     currentStepIndex++; 
                 } else {
                     timer.cancel();
+                    isDone = true;
+                    support.firePropertyChange("drawingComplete", false, true); // Notify listeners
                 }
             }
         };
@@ -77,7 +87,7 @@ public class GanttChart {
             drawnWidth = (lastTime + 1) * timeUnitWidth;
         }
         
-        System.out.println("Current width: " + (animationPanel.getWidth() - drawnWidth) + " Additional Threshold: " + additionalSpaceThreshold);
+        //System.out.println("Current width: " + (animationPanel.getWidth() - drawnWidth) + " Additional Threshold: " + additionalSpaceThreshold);
         if (animationPanel.getWidth() - drawnWidth < additionalSpaceThreshold) {
         	//System.out.println("New Width: " +drawnWidth + additionalSpaceThreshold);
             animationPanel.setPreferredSize(new Dimension(drawnWidth + additionalSpaceThreshold, animationPanel.getHeight()));
@@ -105,11 +115,9 @@ public class GanttChart {
     }
 
     public void drawGanttChart(Graphics g) {
-        int width = animationPanel.getWidth();
         int height = animationPanel.getHeight();
         int barHeight = 50;
         int timeUnitWidth = 30; // Constant width for each time unit
-
         int startX = 120;
 
         for (int i = 0; i < currentStepIndex; i++) {
@@ -117,7 +125,7 @@ public class GanttChart {
             Process process = step.getProcess();
             int processStartX = step.getTime() * timeUnitWidth + startX;
             int processLength = timeUnitWidth;
-            
+
             // Draw the process bar
             g.setColor(processColors.get(process));
             g.fillRect(processStartX, height / 2 - barHeight / 2, 30, barHeight);
@@ -132,21 +140,53 @@ public class GanttChart {
             int currentTimeX = executionSequence.get(currentStepIndex - 1).getTime() * timeUnitWidth;
             g.drawLine(currentTimeX + startX, 0, currentTimeX + startX, height); 
         }
-
-        // Draw the current time in the upper right corner
-        g.setColor(Color.BLACK);
-        String currentTimeString = "Current Time: " + (currentStepIndex > 0 ? executionSequence.get(currentStepIndex - 1).getTime() : 0);
-        FontMetrics fm = g.getFontMetrics();
-        int stringWidth = fm.stringWidth(currentTimeString);
-        g.drawString(currentTimeString, width - stringWidth - 50, fm.getHeight());
         
-     // Draw AnimationTitle centered
-        Font titleFont = new Font("Arial Black", Font.BOLD, 12);
-        FontMetrics titleMetrics = g.getFontMetrics(titleFont);
-        int titleWidth = titleMetrics.stringWidth("Gantt Chart of Process Execution");
-        int titleX = (width - titleWidth) / 2;
-        int titleY = 20; // Adjust as needed
-        g.setFont(titleFont);
-        g.drawString("Gantt Chart of Process Execution", titleX, titleY);
+     // Create a bold font
+        
+     // Clear the area where the current time is drawn in the time panel
+        if (timePanel != null) {
+            Graphics2D g2d = (Graphics2D) timePanel.getGraphics();
+            g2d.setColor(timePanel.getBackground());
+            g2d.fillRect(0, 0, timePanel.getWidth(), timePanel.getHeight());
+        }
+
+        // Draw the current time in the time panel
+        String currentTimeString = "Current Time: " + (currentStepIndex > 0 ? executionSequence.get(currentStepIndex - 1).getTime() : 0);
+        if (timePanel != null) {
+            Graphics2D g2d = (Graphics2D) timePanel.getGraphics();
+            Font boldFont = new Font(g2d.getFont().getName(), Font.BOLD, g2d.getFont().getSize());
+            g2d.setFont(boldFont);
+            g2d.setColor(Color.BLACK);
+            FontMetrics fm = g2d.getFontMetrics();
+            int stringWidth = fm.stringWidth(currentTimeString);
+            g2d.drawString(currentTimeString, timePanel.getWidth() - stringWidth - 50, fm.getHeight() + 6);
+        }
+    }
+
+    public void resetScrollPane() {
+        if (scrollPane != null) {
+            SwingUtilities.invokeLater(() -> {
+                JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
+                horizontalBar.setValue(0); // Set scrollbar position to initial
+            });
+        }
+    }
+
+    private void resetAnimationPanelSize(int width, int height) {
+        if (animationPanel != null) {
+            animationPanel.setPreferredSize(new Dimension(width, height));
+            animationPanel.revalidate();
+        }
+    }
+
+    public boolean isDone(){
+        return isDone;
+    }
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
     }
 }

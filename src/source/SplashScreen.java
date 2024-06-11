@@ -49,7 +49,7 @@ public class SplashScreen extends JFrame {
                     }
                 });
             }
-        }, 2000);
+        }, 8000);
     }
 
     

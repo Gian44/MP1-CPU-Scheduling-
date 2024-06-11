@@ -104,10 +104,10 @@ public class Process {
 
     public String toString() {
 		return "Process ID: "+processId+ 
-				" Completion Time: " +completionTime+ 
-				" Waiting Time: " +getWaitingTime()+
-				" Turnaround Time: " +getTurnaroundTime()+
-				" Response Time: " +getResponseTime();
+				" CT: " +completionTime+ 
+				" WT: " +getWaitingTime()+
+				" TT: " +getTurnaroundTime()+
+				" RT: " +getResponseTime();
     	
     }
 }

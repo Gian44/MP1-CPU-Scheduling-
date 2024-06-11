@@ -6,14 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Random;
-
 import javax.swing.*;
 
+@SuppressWarnings("serial")
 public class MainUI extends javax.swing.JFrame {
 	
 	 // Variables declaration - do not modify                     
     private JLabel AnimationTitle;
     private JButton SimulateBtn;
+    private JComboBox<String> ArrivalQueueComboBox;
     private JLabel ArrivalTimeLabel;
     private JTextField ArrivalTimesTxtField;
     private JTextField AverageRT;
@@ -41,9 +42,14 @@ public class MainUI extends javax.swing.JFrame {
     private JLabel QueueQuantumLbl;
     private JComboBox<String> Queue2AlgoOptions;
     private JLabel Queue2Label;
+    //private JTextField Queue2QuantumInput;
+    //private JLabel Queue2QuantumLbl;
     private JComboBox<String> Queue3AlgoOptions;
     private JLabel Queue3Label;
+    //private JTextField Queue3QuantumInput;
+    //private JLabel Queue3QuantumLbl;
     private JButton RandRadioBtn;
+    //private JRadioButton UserInputRadioBtn;
     private JPanel animationPanel;
     private JTextField numOfProcessTxtField;
     private static Random randNum;
@@ -53,11 +59,16 @@ public class MainUI extends javax.swing.JFrame {
     private String Queue1Algo;
     private int QueueQuantum;
     private String Queue2Algo;
+    //private int Queue2Quantum;
     private String Queue3Algo;
+    //private int Queue3Quantum;
     private LinkedList<ExecutionStep> outputProcess = new LinkedList<>();
     private GanttChart gChart;
     private JScrollPane jScrollPane1;
-    //End of variables declaration  
+    private JPanel TitlePanel;
+    private JPanel TimePanel;
+    private int roundRobinQueueCount = 0;
+    // End of variables declaration  
 
     /**
      * Creates new form MainUI
@@ -81,6 +92,7 @@ public class MainUI extends javax.swing.JFrame {
         ArrivalTimesTxtField = new javax.swing.JTextField();
         ProcessInputLabel = new javax.swing.JLabel();
         MultilevelQueuePanel = new javax.swing.JPanel();
+        ArrivalQueueComboBox = new javax.swing.JComboBox<>();
         Queue3Label = new javax.swing.JLabel();
         Queue3AlgoOptions = new javax.swing.JComboBox<>();
         Queue1Label = new javax.swing.JLabel();
@@ -101,6 +113,8 @@ public class MainUI extends javax.swing.JFrame {
         AverageRT = new javax.swing.JTextField();
         AverageTT = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
+        TitlePanel = new javax.swing.JPanel();
+        TimePanel = new javax.swing.JPanel();
         
         AnimationTitle = new javax.swing.JLabel();
         randNum = new Random();
@@ -130,9 +144,6 @@ public class MainUI extends javax.swing.JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (gChart != null && gChart.isTimerStarted()) {
-                    //System.out.println("gChart: " +(gChart==null));
-                    //System.out.println("Timer Started: " +gChart.isTimerStarted());
-                    //System.out.println("Umagi ha MainUI");
                     gChart.drawGanttChart(g);
                 }
             } 
@@ -199,8 +210,9 @@ public class MainUI extends javax.swing.JFrame {
 
         ProcessInputLabel.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         ProcessInputLabel.setText("Process Input");
-        ProcessPanel.add(ProcessInputLabel);
+        ProcessPanel.add(ProcessInputLabel); 
         ProcessInputLabel.setBounds(100, 10, 90, 16);
+
 
         GeneralPanel.add(ProcessPanel);
         ProcessPanel.setBounds(10, 250, 290, 320);
@@ -216,9 +228,9 @@ public class MainUI extends javax.swing.JFrame {
         Queue3Label.setBounds(70, 160, 60, 14);
 
         Queue3AlgoOptions.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "First Come First Serve", "Shortest Job First", "Shortest Remaining Time First", "Priority (Preemptive)", "Priority (Non-preemptive)", "Round Robin" }));
-        //MultilevelQueuePanel.add(Queue3AlgoOptions);
         ActionEvent initialEvent3 = new ActionEvent(Queue3AlgoOptions, ActionEvent.ACTION_PERFORMED, "");
         Queue3AlgoOptionsActionPerformed(initialEvent3);
+        //MultilevelQueuePanel.add(Queue3AlgoOptions);
         Queue3AlgoOptions.setBounds(140, 160, 191, 22);
         Queue3AlgoOptions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,7 +287,7 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
         MultilevelQueuePanel.add(NumOfQueueComboBox);
-        NumOfQueueComboBox.setBounds(140, 38, 72, 22);
+        NumOfQueueComboBox.setBounds(140, 38, 72, 22); 
 
         MultiLvl_Queue_Label.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         MultiLvl_Queue_Label.setText("Multilevel Queue");
@@ -335,20 +347,20 @@ public class MainUI extends javax.swing.JFrame {
         AverageTTLabel.setBounds(30, 175, 150, 14);
 
         AverageWT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageWT.setText("10");
+        AverageWT.setText("0");
         AverageWT.setEditable(false);
         AveragesPanel.add(AverageWT);
         AverageWT.setBounds(60, 45, 80, 22);
 
         AverageRT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageRT.setText("10");
+        AverageRT.setText("0");
         AverageRT.setEditable(false);
         
         AveragesPanel.add(AverageRT);
         AverageRT.setBounds(60, 125, 80, 22);
 
         AverageTT.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        AverageTT.setText("10");
+        AverageTT.setText("0");
         AverageTT.setEditable(false);
         AveragesPanel.add(AverageTT);
         AverageTT.setBounds(60, 205, 80, 22);
@@ -359,11 +371,52 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-        //AnimationTitle.setFont(new java.awt.Font("Arial Black", 1, 12)); // NOI18N
-        //AnimationTitle.setText("Gantt Chart of Process Execution");
-        //AnimationTitle.setAlignmentX(0.5f);
+        AnimationTitle.setFont(new java.awt.Font("Arial Black", 1, 14)); // NOI18N
+        AnimationTitle.setText("Gantt Chart of Process Execution");
         //animationPanel.setLayout(new OverlayLayout(animationPanel));
         //animationPanel.add(AnimationTitle);
+        
+        javax.swing.GroupLayout TitlePanelLayout = new javax.swing.GroupLayout(TitlePanel);
+        TitlePanel.setLayout(TitlePanelLayout);
+        TitlePanel.setBackground(MultilevelQueuePanel.getBackground());
+        TitlePanelLayout.setHorizontalGroup(
+            TitlePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(TitlePanelLayout.createSequentialGroup()
+                .addGap(388, 388, 388)
+                .addComponent(AnimationTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(402, Short.MAX_VALUE))
+        );
+        TitlePanelLayout.setVerticalGroup(
+            TitlePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(TitlePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(AnimationTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jScrollPane1.setViewportView(animationPanel);
+        jScrollPane1.setBackground(MultilevelQueuePanel.getBackground());
+
+        GeneralPanel.add(jScrollPane1);
+        jScrollPane1.setBounds(10, 50, 1030, 200);
+        
+        GeneralPanel.add(TitlePanel);
+        TitlePanel.setBounds(12, 10, 840, 40);
+        
+        javax.swing.GroupLayout TimePanelLayout = new javax.swing.GroupLayout(TimePanel);
+        TimePanel.setLayout(TimePanelLayout);
+        TimePanel.setBackground(MultilevelQueuePanel.getBackground());
+        TimePanelLayout.setHorizontalGroup(
+            TimePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 190, Short.MAX_VALUE)
+        );
+        TimePanelLayout.setVerticalGroup(
+            TimePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 40, Short.MAX_VALUE)
+        );
+
+        GeneralPanel.add(TimePanel);
+        TimePanel.setBounds(850, 10, 188, 40);
         
         javax.swing.GroupLayout animationPanelLayout = new javax.swing.GroupLayout(animationPanel);
         animationPanel.setLayout(animationPanelLayout);
@@ -383,10 +436,7 @@ public class MainUI extends javax.swing.JFrame {
                 .addContainerGap(212, Short.MAX_VALUE))
         );
 
-        jScrollPane1.setViewportView(animationPanel);
-
-        GeneralPanel.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 10, 1030, 240);
+        
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -406,20 +456,22 @@ public class MainUI extends javax.swing.JFrame {
     /*********    ActionListener Events     ***************/
     
     private void RandRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        int randomNumber = randNum.nextInt(20) + 1;
-        numberOfProcess = randomNumber;
-        numOfProcessTxtField.setText(Integer.toString(randomNumber));
+    	
             
-        generateRandomNumbers(0, randomNumber, ArrivalTimesTxtField);
-        generateRandomNumbers(1, randomNumber, BurstTimeTxtFld);
-        generateRandomNumbers(1,randomNumber, PriorityTxtFld);
+         int randomNumber = randNum.nextInt(20) + 1;
+            numberOfProcess = randomNumber;
+            numOfProcessTxtField.setText(Integer.toString(randomNumber));
+            
+            generateRandomNumbers(0, randomNumber, ArrivalTimesTxtField);
+            generateRandomNumbers(1, randomNumber, BurstTimeTxtFld);
+            generateRandomNumbers(1,randomNumber, PriorityTxtFld);
     }  
      
     private void numOfProcessTxtFieldActionPerformed(java.awt.event.ActionEvent evt) {                                                     
         
     } 
-    
-     private void numOfProcessTxtFieldKeyTyped(KeyEvent evt) {
+     
+    private void numOfProcessTxtFieldKeyTyped(KeyEvent evt) {
     	char c = evt.getKeyChar();
         String currentText = numOfProcessTxtField.getText();
     
@@ -440,7 +492,7 @@ public class MainUI extends javax.swing.JFrame {
             String newText = currentText + c;
             try {
                 int value = Integer.parseInt(newText);
-                if (value < 1 || value > 15) {
+                if (value < 1 || value > 20) {
                     evt.consume(); // Consume input if the entered number is out of range
                 } else {
                 	numOfProcessTxtField.setText(newText);
@@ -462,11 +514,23 @@ public class MainUI extends javax.swing.JFrame {
 		
 	}
     
-
+    
 
     
     private void handleAlgorithmSelection(String selectedAlgorithm) {
+        
+
         if (selectedAlgorithm.equals("Round Robin")) {
+            roundRobinQueueCount++;
+            System.out.println("RoundRob: "+roundRobinQueueCount);
+        }else{
+            if(roundRobinQueueCount > 0){
+                roundRobinQueueCount--;
+                System.out.println("RoundRob: "+roundRobinQueueCount);
+            }
+        }
+    
+        if (roundRobinQueueCount > 0) {
             if (!MultilevelQueuePanel.isAncestorOf(QueueQuantumLbl)) {
                 MultilevelQueuePanel.add(QueueQuantumLbl);
             }
@@ -477,6 +541,7 @@ public class MainUI extends javax.swing.JFrame {
             MultilevelQueuePanel.remove(QueueQuantumLbl);
             MultilevelQueuePanel.remove(QueueQuantumInput);
         }
+    
         revalidate();
         repaint();
     }
@@ -538,12 +603,15 @@ public class MainUI extends javax.swing.JFrame {
 	}
     
     private void NumOfQueueComboBoxActionPerformed(ActionEvent evt) {
+        ArrivalQueueComboBox.removeAllItems(); // Clear existing items
 
         // Add options to comboBox2 based on the selected value of comboBox1
         int selectedValue = Integer.parseInt((String) NumOfQueueComboBox.getSelectedItem());
         numberOfQueues = selectedValue;
         System.out.println("Number of Queues: "+numberOfQueues);
-        
+        for (int i = 1; i <= selectedValue; i++) {
+            ArrivalQueueComboBox.addItem(Integer.toString(i));
+        }
         if(selectedValue == 1) { 
             MultilevelQueuePanel.remove(Queue2Label);
             MultilevelQueuePanel.remove(Queue2AlgoOptions);
@@ -584,16 +652,27 @@ public class MainUI extends javax.swing.JFrame {
         boolean arrivalValid = ArrivalTimesTxtField.getInputVerifier().verify(ArrivalTimesTxtField);
         boolean burstValid = BurstTimeTxtFld.getInputVerifier().verify(BurstTimeTxtFld);
         boolean priorityValid = PriorityTxtFld.getInputVerifier().verify(PriorityTxtFld);
-
+        
             if (arrivalValid && burstValid && priorityValid) {
             	CPUScheduler cpuSched = new CPUScheduler(this);
-            	outputProcess = cpuSched.getOrderedProcesses();
-                System.out.println("Basta");
-            	gChart = new GanttChart(getAnimationPanel(), getScrollPane(),  outputProcess);
-            	gChart.startSimulation(); 
-            } else {
+                outputProcess = cpuSched.getOrderedProcesses();
+                gChart = new GanttChart(getAnimationPanel(), getTimePanel(), getScrollPane(), outputProcess);
+                
+                // Disable the simulate button
+                SimulateBtn.setEnabled(false);
+                
+                // Add a listener to enable the button when drawing is complete
+                gChart.addPropertyChangeListener(event -> { // Renamed the lambda parameter to 'event'
+                    if ("drawingComplete".equals(event.getPropertyName())) {
+                        SimulateBtn.setEnabled(true);
+                    }
+                });
+                
+                gChart.startSimulation();
+            } 
+            else {
                 JOptionPane.showMessageDialog(this, "Mismatch or invalid entries in one of the fields. \n Arrival Time (0-20) only separated by spaces. \n Burst Time (1-20) only separated by spaces. \n Priority (1-20) only separated by spaces \n Arrival Valid: "+arrivalValid+ " Burst Valid: "+burstValid+" Priority Valid: "+priorityValid);
-            }		
+            }		 
 	}  
     
     
@@ -645,6 +724,9 @@ public class MainUI extends javax.swing.JFrame {
     }
     public JTextField getAverageTT() {
     	return AverageTT;
+    }
+    public JPanel getTimePanel() {
+    	return TimePanel;
     }
 }
 
