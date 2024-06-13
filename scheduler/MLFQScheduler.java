@@ -71,14 +71,7 @@ public class MLFQScheduler {
                         }
                         
                         while (runTime > 0) {
-                            if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First") || 
-                            algorithms.get(i).equalsIgnoreCase("Priority (Non-preemptive)")) {
-                                sortProcessQueueByRemainingTime(queues.get(0));
-                                if (higherProcessArrived(currentProcess, algorithms.get(i))) {
-                                    higherProcessArrived = true;
-                                    break;
-                                }   
-                            }
+                            
                             currentProcess.decrementRemainingBurstTime();
                             currentProcess.decrementAllocatedTime();
                             System.out.println("Time: " + time + " - Running Process: " + currentProcess.getProcessId() + " at Queue " + (i + 1));
@@ -87,7 +80,22 @@ public class MLFQScheduler {
                             remainingCPUTime--;
                             runTime--;
                             addProcessToQueue(0);
-                            queueInfos.get(i).decrementRobinRemainingTimeQueue();
+                            if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
+                                sortProcessQueueByRemainingTime(queues.get(0));
+                                if (higherProcessArrived(currentProcess, algorithms.get(i))) {
+                                    break;
+                                }   
+                            }
+                            else if (algorithms.get(i).equalsIgnoreCase("Priority (Preemptive)")) {
+                                sortProcessQueueByPriority(queues.get(i));
+                                if (higherProcessArrived(currentProcess, algorithms.get(i))) {
+                                    break;
+                                }   
+                            }
+
+                            if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
+                                queueInfos.get(i).decrementRobinRemainingTimeQueue();
+                            }
                         }
 
                         if (currentProcess.hasFinishedExecution()) { // Completion
@@ -110,13 +118,6 @@ public class MLFQScheduler {
                             currentProcess.setAllocatedTime(queueInfos.get(i + 1).getTimeQuantum());
                             queues.get(i + 1).add(currentProcess);
                         }
-                        else if ((remainingCPUTime == 0 || higherProcessArrived) 
-                        && i - 1 >= 0 
-                        && !currentProcess.hasFinishedExecution()) { // Promotion
-                            currentProcess.setPriority(currentProcess.getPriority() + 1);
-                            currentProcess.setAllocatedTime(queueInfos.get(i - 1).getTimeQuantum());
-                            queues.get(i - 1).add(currentProcess);
-                        } 
                         else { // Retention
                             if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
                                 if (!queueInfos.get(i).noMoreRobinRemainingTimeQueue()) {
