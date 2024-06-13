@@ -44,11 +44,11 @@ public class MLFQScheduler {
     public void simulate() {
         while (thereAreProcessesToBeExecuted()) {
             for (int i = 0; i < numberOfQueues; i++) {
+                System.out.println("############### QUEUE " + (i + 1) + " ##############");
                 remainingCPUTime = queueInfos.get(i).getTimeSlot();
                 while (remainingCPUTime > 0) {
                     addProcessToQueue(0);
                     if (!currentQueueIsEmpty(i))  {
-                        boolean higherProcessArrived = false;
 
                         if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
                             sortProcessQueueByRemainingTime(queues.get(i));
@@ -74,14 +74,14 @@ public class MLFQScheduler {
                             
                             currentProcess.decrementRemainingBurstTime();
                             currentProcess.decrementAllocatedTime();
-                            System.out.println("Time: " + time + " - Running Process: " + currentProcess.getProcessId() + " at Queue " + (i + 1));
+                            System.out.println("Time: " + time + " - Running Process: " + currentProcess.getProcessId());
                             executionSequence.add(new ExecutionStep(time, currentProcess));
                             time++;
                             remainingCPUTime--;
                             runTime--;
                             addProcessToQueue(0);
                             if (algorithms.get(i).equalsIgnoreCase("Shortest Remaining Time First")) {
-                                sortProcessQueueByRemainingTime(queues.get(0));
+                                sortProcessQueueByRemainingTime(queues.get(i));
                                 if (higherProcessArrived(currentProcess, algorithms.get(i))) {
                                     break;
                                 }   
@@ -114,9 +114,9 @@ public class MLFQScheduler {
                         else if (currentProcess.noMoreAllocatedTime() 
                         && i + 1 < numberOfQueues 
                         && !currentProcess.hasFinishedExecution()) { // Demotion
-                            currentProcess.setPriority(currentProcess.getPriority() - 1);
                             currentProcess.setAllocatedTime(queueInfos.get(i + 1).getTimeQuantum());
                             queues.get(i + 1).add(currentProcess);
+                            System.out.println("Process " + currentProcess.getProcessId() + " has been demoted to Queue #" + (i + 2));
                         }
                         else { // Retention
                             if (algorithms.get(i).equalsIgnoreCase("Round Robin")) {
